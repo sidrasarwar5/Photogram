@@ -35,7 +35,7 @@ INSTALLED_APPS = [
     'tweet',
      'tailwind',
       'theme',
-      'django_browser_reload',
+    #   'django_browser_reload',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -57,7 +57,7 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
-      "django_browser_reload.middleware.BrowserReloadMiddleware",
+    #   "django_browser_reload.middleware.BrowserReloadMiddleware",
 ]
 STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
 ROOT_URLCONF = 'photogram.urls'
