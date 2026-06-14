@@ -513,16 +513,11 @@
                 <a href="/" class="nav-link active" title="Home">
                     <i class="ti ti-home"></i>
                 </a>
-                <a href="/post/create" class="nav-link" title="Create Post">
+                <a href="{% url 'tweet_create' %}" class="nav-link" title="Create Post">
                     <i class="ti ti-plus"></i>
                 </a>
-                <a href="/messages" class="nav-link" title="Messages">
-                    <i class="ti ti-message-circle"></i>
-                    <span class="notification-dot"></span>
-                </a>
-                <a href="/notifications" class="nav-link" title="Notifications">
-                    <i class="ti ti-bell"></i>
-                </a>
+                
+               
             </div>
 
             <div class="navbar-mobile-auth">
