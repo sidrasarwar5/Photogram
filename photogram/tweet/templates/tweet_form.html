@@ -1,0 +1,60 @@
+{% extends "layout.html" %}
+
+{% block title %}
+ Photogram. {% if form.instance.pk %}Edit{% else %}Create{% endif %} Tweet
+{% endblock title %}
+
+{% block content %}
+
+<div class="flex items-center justify-center min-h-[60vh] ">
+    <div class="w-full max-w-lg rounded-2xl bg-white/60 backdrop-blur-xl border border-cyan-900/10 shadow-sm p-6 sm:p-8 ">
+
+        <h2 class="text-lg font-bold text-[#0a4a58] mb-6 flex items-center gap-2">
+            <i class="ti ti-{% if form.instance.pk %}edit{% else %}plus{% endif %} text-xl"></i>
+            {% if form.instance.pk %}
+                Edit Tweet
+            {% else %}
+                Create Tweet
+            {% endif %}
+        </h2>
+
+        <form method="post" enctype="multipart/form-data" class="flex flex-col gap-4">
+            {% csrf_token %}
+
+            {% for field in form %}
+                <div>
+                    <label for="{{ field.id_for_label }}" class="block text-sm font-semibold text-[#0a4a58] mb-3">
+                        {{ field.label }}
+                    </label>
+
+                     <div class="max-w-full overflow-hidden [&_a]:inline-block [&_a]:max-w-[180px] [&_a]:truncate [&_a]:align-middle [&_a]:text-[#1a8fa0]">
+            {{ field }}
+        </div>
+
+                    {% if field.help_text %}
+                        <p class="text-xs text-[#6ab0bc] mt-3">{{ field.help_text }}</p>
+                    {% endif %}
+                    {% for error in field.errors %}
+                        <p class="text-xs text-red-600 mt-1">{{ error }}</p>
+                    {% endfor %}
+                </div>
+            {% endfor %}
+
+            <div class="flex flex-col sm:flex-row gap-3 mt-2">
+                <button type="submit"
+                    class="flex items-center justify-center gap-2 text-sm font-semibold text-white bg-gradient-to-br from-[#3dbccc] to-[#1a8fa0] px-5 py-2.5 rounded-full shadow-md shadow-cyan-900/20 hover:shadow-lg hover:-translate-y-0.5 transition-all order-1">
+                    <i class="ti ti-check"></i>
+                    Submit
+                </button>
+                <a href="{% url 'tweet_list' %}"
+                    class="flex items-center justify-center gap-2 text-sm font-semibold text-[#0a4a58] bg-cyan-500/10 hover:bg-cyan-500/20 px-5 py-2.5 rounded-full transition-colors order-2">
+                    Back to Tweets
+                </a>
+            </div>
+
+        </form>
+
+    </div>
+</div>
+
+{% endblock content %}

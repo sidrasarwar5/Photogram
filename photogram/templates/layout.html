@@ -1,0 +1,646 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="{% static 'css/dist/styles.css' %}">
+
+    <!-- Tabler Icons -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/tabler-icons.min.css">
+
+    <!-- Google Fonts: Inter -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+    <title>{% block title %}Photogram{% endblock %}</title>
+
+    <style>
+        /* ─── Reset & Base ─────────────────────────────────── */
+        *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: linear-gradient(160deg, #e0f2f7 0%, #e8f7f4 40%, #daeef7 100%);
+            background-attachment: fixed;
+            color: #0e2d35;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* ─── Animations ───────────────────────────────────── */
+        @keyframes slideDown {
+            from { transform: translateY(-100%); opacity: 0; }
+            to   { transform: translateY(0);     opacity: 1; }
+        }
+        @keyframes fadeUp {
+            from { opacity: 0; transform: translateY(10px); }
+            to   { opacity: 1; transform: translateY(0);    }
+        }
+        @keyframes pulse {
+            0%, 100% { box-shadow: 0 0 0 0   rgba(42,191,204,0.45); }
+            50%       { box-shadow: 0 0 0 5px rgba(42,191,204,0);    }
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to   { opacity: 1; }
+        }
+        @keyframes slideDownMenu {
+            from { opacity: 0; transform: translateY(-10px); }
+            to   { opacity: 1; transform: translateY(0); }
+        }
+
+        /* ─── Navbar ───────────────────────────────────────── */
+        .navbar {
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            background: rgba(224, 242, 247, 0.82);
+            backdrop-filter: blur(22px);
+            -webkit-backdrop-filter: blur(22px);
+            border-bottom: 1px solid rgba(80, 180, 190, 0.2);
+            padding: 0 28px;
+            height: 62px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 16px;
+            animation: slideDown 0.5s ease;
+        }
+
+        /* Logo */
+        .navbar-logo {
+            display: flex;
+            align-items: center;
+            gap: 9px;
+            font-size: 19px;
+            font-weight: 700;
+            letter-spacing: -0.3px;
+            color: #0a4a58;
+            text-decoration: none;
+            animation: fadeUp 0.5s ease 0.1s both;
+            flex-shrink: 0;
+        }
+        .navbar-logo-icon {
+            width: 34px;
+            height: 34px;
+            border-radius: 11px;
+            background: linear-gradient(135deg, #3dbccc, #1a8fa0);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 17px;
+            box-shadow: 0 2px 14px rgba(30, 160, 180, 0.3);
+            transition: box-shadow 0.25s, transform 0.25s;
+            flex-shrink: 0;
+        }
+        .navbar-logo:hover .navbar-logo-icon {
+            box-shadow: 0 4px 20px rgba(30, 160, 180, 0.45);
+            transform: rotate(-5deg) scale(1.05);
+        }
+
+        /* Search */
+        .navbar-search {
+            position: relative;
+            width: 220px;
+            animation: fadeUp 0.5s ease 0.15s both;
+            flex-shrink: 1;
+            min-width: 0;
+        }
+        .navbar-search input {
+            width: 100%;
+            background: rgba(60, 180, 200, 0.1);
+            border: 1px solid rgba(60, 170, 190, 0.25);
+            border-radius: 100px;
+            padding: 8px 16px 8px 36px;
+            color: #0e2d35;
+            font-size: 13px;
+            font-family: inherit;
+            outline: none;
+            transition: all 0.25s ease;
+        }
+        .navbar-search input::placeholder { color: #6ab0bc; }
+        .navbar-search input:focus {
+            border-color: rgba(30, 160, 180, 0.5);
+            background: rgba(60, 180, 200, 0.18);
+        }
+        .navbar-search .search-icon {
+            position: absolute;
+            left: 12px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #6ab0bc;
+            font-size: 15px;
+            pointer-events: none;
+        }
+
+        /* Nav Links */
+        .navbar-links {
+            display: flex;
+            align-items: center;
+            gap: 2px;
+            animation: fadeUp 0.5s ease 0.2s both;
+            flex-shrink: 0;
+        }
+        .nav-link {
+            width: 40px;
+            height: 40px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #5aacba;
+            font-size: 19px;
+            text-decoration: none;
+            transition: all 0.2s ease;
+            position: relative;
+        }
+        .nav-link:hover {
+            background: rgba(60, 180, 200, 0.15);
+            color: #0a4a58;
+            transform: translateY(-2px);
+        }
+        .nav-link.active {
+            color: #1a8fa0;
+            background: rgba(60, 180, 200, 0.18);
+        }
+        .nav-link .notification-dot {
+            position: absolute;
+            top: 8px;
+            right: 8px;
+            width: 7px;
+            height: 7px;
+            border-radius: 50%;
+            background: #2abfcc;
+            border: 2px solid #e0f2f7;
+            animation: pulse 2s infinite;
+        }
+
+        /* Nav Right */
+        .navbar-right {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            animation: fadeUp 0.5s ease 0.25s both;
+            flex-shrink: 0;
+        }
+        .navbar-avatar {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #3dbccc, #1a8fa0);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 13px;
+            font-weight: 700;
+            color: #fff;
+            text-decoration: none;
+            box-shadow: 0 0 0 2px rgba(42, 191, 204, 0.35);
+            transition: all 0.25s ease;
+            overflow: hidden;
+            flex-shrink: 0;
+        }
+        .navbar-avatar img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            border-radius: 50%;
+        }
+        .navbar-avatar:hover {
+            box-shadow: 0 0 0 3px rgba(42, 191, 204, 0.6);
+            transform: scale(1.06);
+        }
+        .navbar-logout {
+            font-size: 12px;
+            color: #6ab0bc;
+            text-decoration: none;
+            font-weight: 500;
+            transition: color 0.2s ease;
+            white-space: nowrap;
+        }
+        .navbar-logout:hover { color: #0a4a58; }
+        .navbar-login {
+            font-size: 13px;
+            font-weight: 600;
+            color: #fff;
+            background: linear-gradient(135deg, #3dbccc, #1a8fa0);
+            padding: 7px 18px;
+            border-radius: 100px;
+            text-decoration: none;
+            box-shadow: 0 2px 12px rgba(30, 160, 180, 0.3);
+            transition: all 0.25s ease;
+            white-space: nowrap;
+        }
+        .navbar-login:hover {
+            box-shadow: 0 4px 18px rgba(30, 160, 180, 0.45);
+            transform: translateY(-1px);
+        }
+
+        /* Mobile menu toggle button */
+        .navbar-toggle {
+            display: none;
+            width: 40px;
+            height: 40px;
+            border-radius: 12px;
+            align-items: center;
+            justify-content: center;
+            color: #0a4a58;
+            font-size: 22px;
+            background: none;
+            border: none;
+            cursor: pointer;
+            transition: background 0.2s ease;
+            flex-shrink: 0;
+        }
+        .navbar-toggle:hover { background: rgba(60,180,200,0.15); }
+
+        /* Mobile dropdown panel */
+        .navbar-mobile-panel {
+            display: none;
+            position: absolute;
+            top: 62px;
+            left: 0;
+            right: 0;
+            background: rgba(224, 242, 247, 0.97);
+            backdrop-filter: blur(22px);
+            -webkit-backdrop-filter: blur(22px);
+            border-bottom: 1px solid rgba(80, 180, 190, 0.2);
+            padding: 16px 20px 20px;
+            flex-direction: column;
+            gap: 14px;
+            animation: slideDownMenu 0.25s ease;
+            z-index: 99;
+        }
+        .navbar-mobile-panel.open { display: flex; }
+
+        .navbar-mobile-search {
+            position: relative;
+            width: 100%;
+        }
+
+        .navbar-search { position: relative; }
+.search-dropdown {
+    position: absolute;
+    top: calc(100% + 8px);
+    left: 0;
+    right: 0;
+    background: rgba(255, 255, 255, 0.95);
+    backdrop-filter: blur(20px);
+    border: 1px solid rgba(80, 180, 190, 0.2);
+    border-radius: 14px;
+    box-shadow: 0 8px 30px rgba(20, 100, 120, 0.15);
+    max-height: 320px;
+    overflow-y: auto;
+    z-index: 200;
+    display: none;
+}
+.search-dropdown.open { display: block; }
+        .navbar-mobile-search input {
+            width: 100%;
+            background: rgba(60, 180, 200, 0.1);
+            border: 1px solid rgba(60, 170, 190, 0.25);
+            border-radius: 100px;
+            padding: 10px 16px 10px 38px;
+            color: #0e2d35;
+            font-size: 14px;
+            font-family: inherit;
+            outline: none;
+            transition: all 0.25s ease;
+        }
+        .navbar-mobile-search input::placeholder { color: #6ab0bc; }
+        .navbar-mobile-search input:focus {
+            border-color: rgba(30, 160, 180, 0.5);
+            background: rgba(60, 180, 200, 0.18);
+        }
+        .navbar-mobile-search .search-icon {
+            position: absolute;
+            left: 14px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #6ab0bc;
+            font-size: 16px;
+            pointer-events: none;
+        }
+
+        .navbar-mobile-links {
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+            padding: 6px 0;
+        }
+        .navbar-mobile-links .nav-link {
+            width: 48px;
+            height: 48px;
+            font-size: 21px;
+        }
+
+        .navbar-mobile-auth {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 12px;
+            padding-top: 6px;
+            border-top: 1px solid rgba(80, 180, 190, 0.15);
+            padding-top: 14px;
+        }
+        .navbar-mobile-auth .mobile-user {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            text-decoration: none;
+            color: #0e2d35;
+            font-size: 14px;
+            font-weight: 600;
+        }
+
+        /* ─── Main Content ─────────────────────────────────── */
+        main {
+            flex: 1;
+            max-width: 640px;
+            width: 100%;
+            margin: 0 auto;
+            padding: 28px 16px;
+            animation: fadeIn 0.5s ease 0.3s both;
+        }
+
+        /* ─── Footer ───────────────────────────────────────── */
+        .footer {
+            border-top: 1px solid rgba(80, 180, 195, 0.18);
+            padding: 20px 28px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: rgba(210, 242, 248, 0.5);
+            flex-wrap: wrap;
+            gap: 12px;
+        }
+        .footer-links {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 16px;
+        }
+        .footer-links a {
+            font-size: 12px;
+            color: #6ab0bc;
+            text-decoration: none;
+            transition: color 0.2s ease;
+        }
+        .footer-links a:hover { color: #0a4a58; }
+        .footer-brand {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-end;
+            gap: 2px;
+        }
+        .footer-logo {
+            font-size: 13px;
+            font-weight: 700;
+            color: #1a8fa0;
+        }
+        .footer-copy {
+            font-size: 11px;
+            color: #8ac8d4;
+        }
+
+        /* ─── Responsive Breakpoints ───────────────────────── */
+
+        /* Tablet: hide center search, keep icons */
+        @media (max-width: 768px) {
+            .navbar { padding: 0 18px; gap: 10px; }
+            .navbar-search { display: none; }
+            .navbar-logo span { display: none; }
+        }
+
+        /* Mobile: hamburger menu, hide desktop nav links + auth */
+        @media (max-width: 600px) {
+            .navbar { padding: 0 14px; position: relative; }
+            .navbar-links { display: none; }
+            .navbar-right .navbar-login,
+            .navbar-right .navbar-logout { display: none; }
+            .navbar-right .navbar-avatar { display: none; }
+            .navbar-toggle { display: flex; }
+            .navbar-mobile-panel { display: none; }
+            .navbar-mobile-panel.open { display: flex; }
+
+            main { padding: 18px 12px; }
+            .footer { padding: 16px 14px; flex-direction: column; align-items: flex-start; }
+            .footer-brand { align-items: flex-start; }
+        }
+
+        @media (max-width: 380px) {
+            .navbar-mobile-links { flex-wrap: wrap; gap: 8px; }
+            .navbar-mobile-links .nav-link { width: 44px; height: 44px; font-size: 19px; }
+        }
+    </style>
+
+    {% block extra_head %}{% endblock %}
+</head>
+
+<body>
+
+    <!-- ─── NAVBAR ─────────────────────────────────────────── -->
+    <nav class="navbar">
+
+        <!-- Logo -->
+        <a href="/" class="navbar-logo">
+            <div class="navbar-logo-icon">📷</div>
+            <span>Photogram</span>
+        </a>
+
+        <!-- Search (desktop/tablet) -->
+        <div class="navbar-search">
+            <form action="{% url 'search' %}" method="get" class="navbar-search" id="searchForm" autocomplete="off">
+    <i class="ti ti-search search-icon"></i>
+    <input type="text" name="q" id="searchInput" placeholder="Search people, posts..." value="{{ request.GET.q }}">
+    <div id="searchDropdown" class="search-dropdown"></div>
+</form>
+        </div>
+
+        <!-- Nav Icons (desktop) -->
+        <div class="navbar-links">
+            <a href="/" class="nav-link active" title="Home">
+                <i class="ti ti-home"></i>
+            </a>
+            <a href="{% url 'tweet_create' %}" class="nav-link" title="Create Post">
+                <i class="ti ti-plus"></i>
+            </a>
+            
+            
+        </div>
+
+        <!-- Auth (desktop) -->
+        <div class="navbar-right">
+            {% if user.is_authenticated %}
+                <a href="/profile/{{ user.username }}" class="navbar-avatar" title="{{ user.username }}">
+                    {% if user.profile.avatar %}
+                        <img src="{{ user.profile.avatar.url }}" alt="{{ user.username }}">
+                    {% else %}
+                        {{ user.username|first|upper }}
+                    {% endif %}
+                </a>
+                <form action="{% url 'logout' %}" method="post" style="display:inline;">
+    {% csrf_token %}
+    <button type="submit" class="navbar-logout" style="background:none;border:none;padding:0;font-size:12px;color:#6ab0bc;cursor:pointer;">
+        Logout
+    </button>
+</form>
+            {% else %}
+                <a href="{% url 'login' %}" class="navbar-login">Login / Sign up</a>
+            {% endif %}
+
+            <!-- Hamburger (mobile only) -->
+            <button class="navbar-toggle" id="navToggle" aria-label="Toggle menu">
+                <i class="ti ti-menu-2" id="navToggleIcon"></i>
+            </button>
+        </div>
+
+        <!-- ─── Mobile dropdown panel ─────────────────────── -->
+        <div class="navbar-mobile-panel" id="mobilePanel">
+
+            <div class="navbar-mobile-search">
+              <form action="{% url 'search' %}" method="get" class="navbar-search" id="searchForm" autocomplete="off">
+    <i class="ti ti-search search-icon"></i>
+    <input type="text" name="q" id="searchInput" placeholder="Search people, posts..." value="{{ request.GET.q }}">
+    <div id="searchDropdown" class="search-dropdown"></div>
+</form>
+</form>
+            </div>
+
+            <div class="navbar-mobile-links">
+                <a href="/" class="nav-link active" title="Home">
+                    <i class="ti ti-home"></i>
+                </a>
+                <a href="/post/create" class="nav-link" title="Create Post">
+                    <i class="ti ti-plus"></i>
+                </a>
+                <a href="/messages" class="nav-link" title="Messages">
+                    <i class="ti ti-message-circle"></i>
+                    <span class="notification-dot"></span>
+                </a>
+                <a href="/notifications" class="nav-link" title="Notifications">
+                    <i class="ti ti-bell"></i>
+                </a>
+            </div>
+
+            <div class="navbar-mobile-auth">
+                {% if user.is_authenticated %}
+                    <a href="/profile/{{ user.username }}" class="mobile-user">
+                        <span class="navbar-avatar" style="width:32px;height:32px;font-size:12px;">
+                            {% if user.profile.avatar %}
+                                <img src="{{ user.profile.avatar.url }}" alt="{{ user.username }}">
+                            {% else %}
+                                {{ user.username|first|upper }}
+                            {% endif %}
+                        </span>
+                        {{ user.username }}
+                    </a>
+                    <form action="{% url 'logout' %}" method="post">
+                        {% csrf_token %}
+                        <button type="submit" class="navbar-logout" style="background:none;border:none;padding:0;font-size:12px;color:#6ab0bc;cursor:pointer;">
+                            Logout
+                        </button>
+                    </form>
+                  
+                {% else %}
+                    <a href="{% url 'login' %}" class="navbar-login" style="width:100%;text-align:center;">Login / Sign up</a>
+                {% endif %}
+            </div>
+
+        </div>
+
+    </nav>
+
+    <!-- ─── MAIN CONTENT ───────────────────────────────────── -->
+    <main>
+        {% block content %}
+        {% endblock %}
+    </main>
+
+    <!-- ─── FOOTER ─────────────────────────────────────────── -->
+    <footer class="footer">
+        <div class="footer-links">
+            <a href="#">About</a>
+            <a href="#">Help</a>
+            <a href="#">Privacy</a>
+            <a href="#">Terms</a>
+            <a href="#">Contact</a>
+        </div>
+        <div class="footer-brand">
+            <span class="footer-logo">📷 Photogram</span>
+            <span class="footer-copy">© 2026 Photogram</span>
+        </div>
+    </footer>
+
+    <script>
+        // Mobile menu toggle
+        const navToggle = document.getElementById('navToggle');
+        const navToggleIcon = document.getElementById('navToggleIcon');
+        const mobilePanel = document.getElementById('mobilePanel');
+
+        navToggle.addEventListener('click', () => {
+            const isOpen = mobilePanel.classList.toggle('open');
+            navToggleIcon.className = isOpen ? 'ti ti-x' : 'ti ti-menu-2';
+        });
+
+        // Close menu when a link inside it is clicked
+        mobilePanel.querySelectorAll('a').forEach(link => {
+            link.addEventListener('click', () => {
+                mobilePanel.classList.remove('open');
+                navToggleIcon.className = 'ti ti-menu-2';
+            });
+        });
+    </script>
+
+    {% block extra_scripts %}{% endblock %}
+
+
+    <script>
+function setupSearch(inputId, dropdownId, formId) {
+    const input = document.getElementById(inputId);
+    const dropdown = document.getElementById(dropdownId);
+    const form = document.getElementById(formId);
+    if (!input || !dropdown) return;
+
+    let timeout;
+    input.addEventListener('input', () => {
+        clearTimeout(timeout);
+        const query = input.value.trim();
+        if (!query) {
+            dropdown.classList.remove('open');
+            dropdown.innerHTML = '';
+            return;
+        }
+        timeout = setTimeout(() => {
+            fetch(`{% url 'search_suggestions' %}?q=${encodeURIComponent(query)}`)
+                .then(res => res.json())
+                .then(data => {
+                    dropdown.innerHTML = data.html;
+                    dropdown.classList.add('open');
+                });
+        }, 250);
+    });
+
+    // Close dropdown when clicking outside
+    document.addEventListener('click', (e) => {
+        if (!form.contains(e.target)) {
+            dropdown.classList.remove('open');
+        }
+    });
+
+    // Pressing Enter submits the form (full page navigation) - default behavior, just ensure dropdown doesn't block it
+    input.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter') {
+            dropdown.classList.remove('open');
+        }
+    });
+}
+
+setupSearch('searchInput', 'searchDropdown', 'searchForm');
+setupSearch('searchInputMobile', 'searchDropdownMobile', 'searchFormMobile');
+</script>
+
+</body>
+</html>

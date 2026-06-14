@@ -1,0 +1,73 @@
+{% extends "layout.html" %}
+
+{% block title %}
+ Photogram. Register
+{% endblock title %}
+
+{% block content %}
+
+<div class="flex items-center justify-center min-h-[70vh]">
+    <div class="w-full max-w-md rounded-2xl bg-white/70 backdrop-blur-xl border border-cyan-900/10 shadow-lg shadow-cyan-900/5 p-6 sm:p-8">
+
+        <div class="text-center mb-7">
+            <div class="w-14 h-14 mx-auto mb-3 text-2xl flex items-center justify-center rounded-2xl bg-gradient-to-br from-[#3dbccc] to-[#1a8fa0] shadow-md shadow-cyan-900/25">
+                📷
+            </div>
+            <h1 class="text-xl font-bold text-[#0a4a58]">Create your account</h1>
+            <p class="text-sm text-[#6ab0bc] mt-1">Join Photogram and start sharing</p>
+        </div>
+
+        {% if form.non_field_errors %}
+            <div class="mb-4 rounded-xl bg-red-500/10 border border-red-500/20 px-4 py-2.5 text-sm text-red-600 flex items-start gap-2">
+                <i class="ti ti-alert-circle text-base mt-0.5"></i>
+                <div>
+                    {% for error in form.non_field_errors %}
+                        <p>{{ error }}</p>
+                    {% endfor %}
+                </div>
+            </div>
+        {% endif %}
+
+        <form method="post" class="flex flex-col gap-4">
+            {% csrf_token %}
+
+            {% for field in form %}
+                <div>
+                    <label for="{{ field.id_for_label }}" class="block text-sm font-semibold text-[#0a4a58] mb-1.5">
+                        {{ field.label }}
+                    </label>
+                    {{ field }}
+                    {% if field.help_text %}
+                        <p class="text-xs text-[#6ab0bc] mt-1">{{ field.help_text }}</p>
+                    {% endif %}
+                    {% for error in field.errors %}
+                        <p class="text-xs text-red-600 mt-1 flex items-center gap-1">
+                            <i class="ti ti-alert-circle"></i>{{ error }}
+                        </p>
+                    {% endfor %}
+                </div>
+            {% endfor %}
+
+            <button type="submit"
+                class="flex items-center justify-center gap-2 text-sm font-semibold text-white bg-gradient-to-br from-[#3dbccc] to-[#1a8fa0] px-5 py-3 rounded-full shadow-md shadow-cyan-900/25 hover:shadow-lg hover:-translate-y-0.5 active:translate-y-0 transition-all mt-2">
+                <i class="ti ti-user-plus"></i>
+                Create Account
+            </button>
+
+        </form>
+
+        <div class="flex items-center gap-3 my-6">
+            <div class="flex-1 h-px bg-cyan-900/10"></div>
+            <span class="text-xs text-[#8ac8d4]">OR</span>
+            <div class="flex-1 h-px bg-cyan-900/10"></div>
+        </div>
+
+        <p class="text-center text-sm text-[#6ab0bc]">
+            Already have an account?
+            <a href="{% url 'login' %}" class="font-semibold text-[#1a8fa0] hover:text-[#0a4a58] transition-colors">Log in</a>
+        </p>
+
+    </div>
+</div>
+
+{% endblock content %}
