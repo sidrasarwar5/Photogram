@@ -115,9 +115,7 @@ STATIC_URL = '/static/'
 STATICFILES_DIRS = [BASE_DIR / 'static']
 STATIC_ROOT = BASE_DIR / 'staticfiles'
 
-# Required by django-cloudinary-storage's collectstatic override
-# STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
-
+STATICFILES_STORAGE = 'whitenoise.storage.CompressedStaticFilesStorage'
 
 WHITENOISE_MANIFEST_STRICT = False
 
@@ -126,10 +124,9 @@ STORAGES = {
         "BACKEND": "cloudinary_storage.storage.MediaCloudinaryStorage",
     },
     "staticfiles": {
-    "BACKEND": "whitenoise.storage.CompressedStaticFilesStorage",
-},
+        "BACKEND": "whitenoise.storage.CompressedStaticFilesStorage",
+    },
 }
-
 
 # Auth redirects
 LOGIN_URL = '/accounts/login'
