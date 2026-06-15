@@ -136,6 +136,23 @@
             pointer-events: none;
         }
 
+        .search-dropdown {
+            position: absolute;
+            top: calc(100% + 8px);
+            left: 0;
+            right: 0;
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(80, 180, 190, 0.2);
+            border-radius: 14px;
+            box-shadow: 0 8px 30px rgba(20, 100, 120, 0.15);
+            max-height: 320px;
+            overflow-y: auto;
+            z-index: 200;
+            display: none;
+        }
+        .search-dropdown.open { display: block; }
+
         /* Nav Links */
         .navbar-links {
             display: flex;
@@ -280,24 +297,9 @@
             position: relative;
             width: 100%;
         }
-
-        .navbar-search { position: relative; }
-.search-dropdown {
-    position: absolute;
-    top: calc(100% + 8px);
-    left: 0;
-    right: 0;
-    background: rgba(255, 255, 255, 0.95);
-    backdrop-filter: blur(20px);
-    border: 1px solid rgba(80, 180, 190, 0.2);
-    border-radius: 14px;
-    box-shadow: 0 8px 30px rgba(20, 100, 120, 0.15);
-    max-height: 320px;
-    overflow-y: auto;
-    z-index: 200;
-    display: none;
-}
-.search-dropdown.open { display: block; }
+        .navbar-mobile-search .navbar-search {
+            width: 100%;
+        }
         .navbar-mobile-search input {
             width: 100%;
             background: rgba(60, 180, 200, 0.1);
@@ -451,13 +453,11 @@
         </a>
 
         <!-- Search (desktop/tablet) -->
-        <div class="navbar-search">
-            <form action="{% url 'search' %}" method="get" class="navbar-search" id="searchForm" autocomplete="off">
-    <i class="ti ti-search search-icon"></i>
-    <input type="text" name="q" id="searchInput" placeholder="Search people, posts..." value="{{ request.GET.q }}">
-    <div id="searchDropdown" class="search-dropdown"></div>
-</form>
-        </div>
+        <form action="{% url 'search' %}" method="get" class="navbar-search" id="searchForm" autocomplete="off">
+            <i class="ti ti-search search-icon"></i>
+            <input type="text" name="q" id="searchInput" placeholder="Search people, posts..." value="{{ request.GET.q }}">
+            <div id="searchDropdown" class="search-dropdown"></div>
+        </form>
 
         <!-- Nav Icons (desktop) -->
         <div class="navbar-links">
@@ -467,8 +467,6 @@
             <a href="{% url 'tweet_create' %}" class="nav-link" title="Create Post">
                 <i class="ti ti-plus"></i>
             </a>
-            
-            
         </div>
 
         <!-- Auth (desktop) -->
@@ -482,11 +480,11 @@
                     {% endif %}
                 </a>
                 <form action="{% url 'logout' %}" method="post" style="display:inline;">
-    {% csrf_token %}
-    <button type="submit" class="navbar-logout" style="background:none;border:none;padding:0;font-size:12px;color:#6ab0bc;cursor:pointer;">
-        Logout
-    </button>
-</form>
+                    {% csrf_token %}
+                    <button type="submit" class="navbar-logout" style="background:none;border:none;padding:0;font-size:12px;color:#6ab0bc;cursor:pointer;">
+                        Logout
+                    </button>
+                </form>
             {% else %}
                 <a href="{% url 'login' %}" class="navbar-login">Login / Sign up</a>
             {% endif %}
@@ -501,12 +499,11 @@
         <div class="navbar-mobile-panel" id="mobilePanel">
 
             <div class="navbar-mobile-search">
-              <form action="{% url 'search' %}" method="get" class="navbar-search" id="searchForm" autocomplete="off">
-    <i class="ti ti-search search-icon"></i>
-    <input type="text" name="q" id="searchInput" placeholder="Search people, posts..." value="{{ request.GET.q }}">
-    <div id="searchDropdown" class="search-dropdown"></div>
-</form>
-</form>
+                <form action="{% url 'search' %}" method="get" class="navbar-search" id="searchFormMobile" autocomplete="off">
+                    <i class="ti ti-search search-icon"></i>
+                    <input type="text" name="q" id="searchInputMobile" placeholder="Search people, posts..." value="{{ request.GET.q }}">
+                    <div id="searchDropdownMobile" class="search-dropdown"></div>
+                </form>
             </div>
 
             <div class="navbar-mobile-links">
@@ -516,8 +513,6 @@
                 <a href="{% url 'tweet_create' %}" class="nav-link" title="Create Post">
                     <i class="ti ti-plus"></i>
                 </a>
-                
-               
             </div>
 
             <div class="navbar-mobile-auth">
@@ -538,7 +533,6 @@
                             Logout
                         </button>
                     </form>
-                  
                 {% else %}
                     <a href="{% url 'login' %}" class="navbar-login" style="width:100%;text-align:center;">Login / Sign up</a>
                 {% endif %}
@@ -587,55 +581,51 @@
                 navToggleIcon.className = 'ti ti-menu-2';
             });
         });
+
+        // Search dropdown setup
+        function setupSearch(inputId, dropdownId, formId) {
+            const input = document.getElementById(inputId);
+            const dropdown = document.getElementById(dropdownId);
+            const form = document.getElementById(formId);
+            if (!input || !dropdown || !form) return;
+
+            let timeout;
+            input.addEventListener('input', () => {
+                clearTimeout(timeout);
+                const query = input.value.trim();
+                if (!query) {
+                    dropdown.classList.remove('open');
+                    dropdown.innerHTML = '';
+                    return;
+                }
+                timeout = setTimeout(() => {
+                    fetch(`{% url 'search_suggestions' %}?q=${encodeURIComponent(query)}`)
+                        .then(res => res.json())
+                        .then(data => {
+                            dropdown.innerHTML = data.html;
+                            dropdown.classList.add('open');
+                        });
+                }, 250);
+            });
+
+            document.addEventListener('click', (e) => {
+                if (!form.contains(e.target)) {
+                    dropdown.classList.remove('open');
+                }
+            });
+
+            input.addEventListener('keydown', (e) => {
+                if (e.key === 'Enter') {
+                    dropdown.classList.remove('open');
+                }
+            });
+        }
+
+        setupSearch('searchInput', 'searchDropdown', 'searchForm');
+        setupSearch('searchInputMobile', 'searchDropdownMobile', 'searchFormMobile');
     </script>
 
     {% block extra_scripts %}{% endblock %}
-
-
-    <script>
-function setupSearch(inputId, dropdownId, formId) {
-    const input = document.getElementById(inputId);
-    const dropdown = document.getElementById(dropdownId);
-    const form = document.getElementById(formId);
-    if (!input || !dropdown) return;
-
-    let timeout;
-    input.addEventListener('input', () => {
-        clearTimeout(timeout);
-        const query = input.value.trim();
-        if (!query) {
-            dropdown.classList.remove('open');
-            dropdown.innerHTML = '';
-            return;
-        }
-        timeout = setTimeout(() => {
-            fetch(`{% url 'search_suggestions' %}?q=${encodeURIComponent(query)}`)
-                .then(res => res.json())
-                .then(data => {
-                    dropdown.innerHTML = data.html;
-                    dropdown.classList.add('open');
-                });
-        }, 250);
-    });
-
-    // Close dropdown when clicking outside
-    document.addEventListener('click', (e) => {
-        if (!form.contains(e.target)) {
-            dropdown.classList.remove('open');
-        }
-    });
-
-    // Pressing Enter submits the form (full page navigation) - default behavior, just ensure dropdown doesn't block it
-    input.addEventListener('keydown', (e) => {
-        if (e.key === 'Enter') {
-            dropdown.classList.remove('open');
-        }
-    });
-}
-
-setupSearch('searchInput', 'searchDropdown', 'searchForm');
-setupSearch('searchInputMobile', 'searchDropdownMobile', 'searchFormMobile');
-</script>
 
 </body>
 </html>
