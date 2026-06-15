@@ -297,9 +297,11 @@
             position: relative;
             width: 100%;
         }
-        .navbar-mobile-search .navbar-search {
-            width: 100%;
-        }
+       .navbar-mobile-search-form {
+    position: relative;
+    width: 100%;
+    display: block;
+}
         .navbar-mobile-search input {
             width: 100%;
             background: rgba(60, 180, 200, 0.1);
@@ -498,13 +500,13 @@
         <!-- ─── Mobile dropdown panel ─────────────────────── -->
         <div class="navbar-mobile-panel" id="mobilePanel">
 
-            <div class="navbar-mobile-search">
-                <form action="{% url 'search' %}" method="get" class="navbar-search" id="searchFormMobile" autocomplete="off">
-                    <i class="ti ti-search search-icon"></i>
-                    <input type="text" name="q" id="searchInputMobile" placeholder="Search people, posts..." value="{{ request.GET.q }}">
-                    <div id="searchDropdownMobile" class="search-dropdown"></div>
-                </form>
-            </div>
+<div class="navbar-mobile-search">
+    <form action="{% url 'search' %}" method="get" class="navbar-mobile-search-form" id="searchFormMobile" autocomplete="off">
+        <i class="ti ti-search search-icon"></i>
+        <input type="text" name="q" id="searchInputMobile" placeholder="Search people, posts..." value="{{ request.GET.q }}">
+        <div id="searchDropdownMobile" class="search-dropdown"></div>
+    </form>
+</div>
 
             <div class="navbar-mobile-links">
                 <a href="/" class="nav-link active" title="Home">
