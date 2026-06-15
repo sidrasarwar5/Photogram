@@ -33,7 +33,7 @@ ALLOWED_HOSTS = ['photogram-pfnn.onrender.com']
 # Application definition
 
 INSTALLED_APPS = [
-    'cloudinary_storage',
+    # 'cloudinary_storage',
     'cloudinary',
     'tweet',
     'tailwind',
